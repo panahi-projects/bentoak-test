@@ -13,24 +13,21 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signInSchema } from "../validationSchemas";
 
-interface SignInForm {
-  email: string;
-  password: string;
-  rememberMe: boolean;
-}
+type SignInForm = z.infer<typeof signInSchema>;
 
 export default function SignInPage() {
-  const { register, handleSubmit } = useForm<SignInForm>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignInForm>({
+    resolver: zodResolver(signInSchema),
+  });
 
-  // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault();
-  //   const data = new FormData(event.currentTarget);
-  //   console.log({
-  //     email: data.get("email"),
-  //     password: data.get("password"),
-  //   });
-  // };
   const onSubmitForm = (data: SignInForm) => {
     console.log({ data });
   };
@@ -59,22 +56,24 @@ export default function SignInPage() {
         >
           <TextField
             margin="normal"
-            required
             fullWidth
             id="email"
             label="Email Address"
             autoComplete="email"
             autoFocus
+            error={!!errors.email?.message}
+            helperText={errors.email?.message}
             {...register("email")}
           />
           <TextField
             margin="normal"
-            required
             fullWidth
             label="Password"
             type="password"
             id="password"
             autoComplete="current-password"
+            error={!!errors.password?.message}
+            helperText={errors.password?.message}
             {...register("password")}
           />
           <FormControlLabel
